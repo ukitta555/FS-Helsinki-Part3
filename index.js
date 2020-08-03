@@ -1,4 +1,5 @@
 const express = require ('express')
+const { response } = require('express')
 const app = express() 
 
 
@@ -44,6 +45,21 @@ app.get ('/info', (req, res) =>
                                           <p> ${currentDate} </p>
                                         `) 
                               }    
+        )
+
+app.get ('/api/persons/:id', (req, res) =>
+                                          {
+                                             const id = Number(req.params.id)
+                                             const person = persons.find (person => person.id === id)
+                                             if (person)
+                                             {
+                                              res.json (person)
+                                             } else 
+                                             {
+                                              res.status(404).end()
+                                             }
+                                             
+                                          }
         )
 const port = 3001
 app.listen (port, () => {
