@@ -37,6 +37,14 @@ app.get ('/api/persons', (req, res) =>
                                     }
         ) 
 
+app.get ('/info', (req, res) =>
+                              {
+                                const currentDate = new Date()
+                                res.send(`<p> Phonebook has info for ${persons.length} people </p>
+                                          <p> ${currentDate} </p>
+                                        `) 
+                              }    
+        )
 const port = 3001
 app.listen (port, () => {
                           console.log (`App running on port ${port}`)
