@@ -74,6 +74,19 @@ app.delete('/api/persons/:id', (req, res) =>
 app.post ('/api/persons', (request, response) =>
                                               {
                                                 const person = request.body
+                                                if (!person.name || !person.number)
+                                                {
+                                                  return response.status(400)
+                                                                 .json({error: "no name or no number provided"})
+                                                }
+                                                if (persons.map(person => person.name.toLocaleLowerCase())
+                                                           .findIndex(entry => {return person.name.toLocaleLowerCase() === entry})
+                                                           !== -1
+                                                   )
+                                                {
+                                                  return response.status(400)
+                                                                 .json ({error: "name must be unique"})
+                                                }
                                                 person.id = Math.floor(Math.random() * 100000)
                                                 
 
