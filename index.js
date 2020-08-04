@@ -4,7 +4,16 @@ const app = express()
 
 
 app.use (express.json())
-app.use(morgan('tiny'))
+
+
+morgan.token ('bodyOutput', (request, result) =>
+                                                {
+                                                  if (request.method === "POST") return JSON.stringify(request.body)
+                                                  else return ''
+                                                }
+             )
+
+             app.use(morgan(':method :url :status :res[content-length] - :response-time ms :bodyOutput'))
 
 let persons = [
   { 
@@ -72,6 +81,8 @@ app.delete('/api/persons/:id', (req, res) =>
                                               res.status(204).end()
                                             }
           )
+
+
 
 app.post ('/api/persons', (request, response) =>
                                               {
