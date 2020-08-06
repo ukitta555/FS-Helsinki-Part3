@@ -1,8 +1,9 @@
 const express = require ('express')
 const morgan = require('morgan')
+const cors = require ('cors')
 const app = express() 
 
-
+app.use(cors())
 app.use (express.json())
 
 
@@ -18,22 +19,22 @@ morgan.token ('bodyOutput', (request, result) =>
 let persons = [
   { 
     name: "Arto Hellas", 
-    number: "040-123456",
+    phone: "040-123456",
     id: 1
   },
   { 
     name: "Ada Lovelace", 
-    number: "39-44-5323523",
+    phone: "39-44-5323523",
     id: 2
   },
   { 
     name: "Dan Abramov", 
-    number: "12-43-234345",
+    phone: "12-43-234345",
     id: 3
   },
   { 
     name: "Mary Poppendieck", 
-    number: "39-23-6423122",
+    phone: "39-23-6423122",
     id: 4
   }
 ]
@@ -87,10 +88,10 @@ app.delete('/api/persons/:id', (req, res) =>
 app.post ('/api/persons', (request, response) =>
                                               {
                                                 const person = request.body
-                                                if (!person.name || !person.number)
+                                                if (!person.name || !person.phone)
                                                 {
                                                   return response.status(400)
-                                                                 .json({error: "no name or no number provided"})
+                                                                 .json({error: "no name or no phone provided"})
                                                 }
                                                 if (persons.map(person => person.name.toLocaleLowerCase())
                                                            .findIndex(entry => {return person.name.toLocaleLowerCase() === entry})
