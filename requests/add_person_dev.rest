@@ -1,0 +1,7 @@
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+  "name": "Bill Gates",
+  "phone": "8-800-555-35-35"
+}

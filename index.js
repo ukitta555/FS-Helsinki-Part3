@@ -17,7 +17,7 @@ morgan.token ('bodyOutput', (request, result) =>
                                                 }
              )
 
-             app.use(morgan(':method :url :status :res[content-length] - :response-time ms :bodyOutput'))
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :bodyOutput'))
 
 
 
@@ -94,30 +94,39 @@ app.delete('/api/persons/:id', (request, response) =>
 
 app.post ('/api/persons', (request, response) =>
                                               {
-                                                const person = request.body
-                                                if (!person.name || !person.phone)
+                                                const body = request.body
+                                                if (!body.name || !body.phone)
                                                 {
                                                   return response.status(400)
                                                                  .json({error: "no name or no phone provided"})
                                                 }
-                                                if (persons.map(person => person.name.toLocaleLowerCase())
-                                                           .findIndex(entry => {return person.name.toLocaleLowerCase() === entry})
-                                                           !== -1
-                                                   )
-                                                {
-                                                  return response.status(400)
-                                                                 .json ({error: "name must be unique"})
-                                                }
-                                                person.id = Math.floor(Math.random() * 100000)
-                                                
-
-                                                persons = persons.concat(person)
-
-                                                console.log (person)
-                                                console.log(persons)
-
-                                                response.json (person)
-                                              }
+                                                Person.find({})
+                                                      .then(people => 
+                                                                      {
+                                                                        console.log(people)
+                                                                        if (people.map(person => person.name.toLocaleLowerCase())
+                                                                                   .findIndex(personName => {return body.name.toLocaleLowerCase() === personName})
+                                                                                   !== -1
+                                                                           )
+                                                                        {
+                                                                          response.status(400)
+                                                                                  .json ({error: "name must be unique"})
+                                                                          throw new Error ("name has to be unique!")
+                                                                        }
+                                                                        const person = new Person (
+                                                                                                    {
+                                                                                                      name: body.name,
+                                                                                                      phone: body.phone
+                                                                                                    }
+                                                                                                  )
+                                                                        return person.save()
+                                                                      }
+                                                           )
+                                                      .then (savedPerson => {
+                                                                              response.json(savedPerson)
+                                                                            })
+                                                      .catch(error => console.log (`error occurred:`, error.message))
+                                              } 
          )
 
 
