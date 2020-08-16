@@ -1,7 +1,10 @@
+require('dotenv').config()
 const express = require ('express')
 const morgan = require('morgan')
 const cors = require ('cors')
 const app = express() 
+const Person = require('./models/person')
+
 
 app.use(cors())
 app.use (express.json())
@@ -15,6 +18,9 @@ morgan.token ('bodyOutput', (request, result) =>
              )
 
              app.use(morgan(':method :url :status :res[content-length] - :response-time ms :bodyOutput'))
+
+
+
 
 let persons = [
   { 
@@ -39,47 +45,48 @@ let persons = [
   }
 ]
 
-app.get ('/', (req, res) =>
-                          {
-                            res.send('<h1> Hello World! </h1>')
-                          }
+app.get ('/', (request, response) =>
+                                    {
+                                      response.send('<h1> Hello World! </h1>')
+                                    }
         )
 
-app.get ('/api/persons', (req, res) =>
-                                    {
-                                      res.json (persons)
-                                    }
+app.get ('/api/persons', (request, response) =>
+                                              {
+                                                Person.find({})
+                                                      .then (people => response.json(people))
+                                              }
         ) 
 
-app.get ('/info', (req, res) =>
-                              {
-                                const currentDate = new Date()
-                                res.send(`<p> Phonebook has info for ${persons.length} people </p>
-                                          <p> ${currentDate} </p>
-                                        `) 
-                              }    
+app.get ('/info', (request, response) =>
+                                        {
+                                          const currentDate = new Date()
+                                          response.send(`<p> Phonebook has info for ${persons.length} people </p>
+                                                    <p> ${currentDate} </p>
+                                                  `) 
+                                        }    
         )
 
-app.get ('/api/persons/:id', (req, res) =>
-                                          {
-                                             const id = Number(req.params.id)
-                                             const person = persons.find (person => person.id === id)
-                                             if (person)
-                                             {
-                                              res.json (person)
-                                             } else 
-                                             {
-                                              res.status(404).end()
-                                             }
-                                             
-                                          }
+app.get ('/api/persons/:id', (request, response) =>
+                                                  {
+                                                    const id = Number(request.params.id)
+                                                    const person = persons.find (person => person.id === id)
+                                                    if (person)
+                                                    {
+                                                      response.json (person)
+                                                    } else 
+                                                    {
+                                                      response.status(404).end()
+                                                    }
+                                                    
+                                                  }
         )
 
-app.delete('/api/persons/:id', (req, res) =>
+app.delete('/api/persons/:id', (request, response) =>
                                             {
-                                              const id = Number (req.params.id)
+                                              const id = Number (request.params.id)
                                               persons = persons.filter (person => person.id !== id)
-                                              res.status(204).end()
+                                              response.status(204).end()
                                             }
           )
 
