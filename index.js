@@ -35,27 +35,39 @@ app.get ('/api/persons', (request, response, next) =>
                                                     }
         ) 
 
-app.get ('/info', (request, response) =>
+app.get ('/info', (request, response, next) =>
                                         {
-                                          const currentDate = new Date()
-                                          response.send(`<p> Phonebook has info for ${persons.length} people </p>
-                                                    <p> ${currentDate} </p>
-                                                  `) 
+                                          Person.find({})
+                                                .then(people => 
+                                                              {
+                                                                let length = 0;
+                                                                if (people) length = people.length
+                                                                
+                                                                const currentDate = new Date()
+                                                                response.send(`<p> Phonebook has info for ${length} people </p>
+                                                                          <p> ${currentDate} </p>
+                                                                        `) 
+                                                              } 
+                                                    )
+                                                .catch(error => next(error))
                                         }    
         )
 
-app.get ('/api/persons/:id', (request, response) =>
+app.get ('/api/persons/:id', (request, response, next) =>
                                                   {
-                                                    const id = Number(request.params.id)
-                                                    const person = persons.find (person => person.id === id)
-                                                    if (person)
-                                                    {
-                                                      response.json (person)
-                                                    } else 
-                                                    {
-                                                      response.status(404).end()
-                                                    }
-                                                    
+                                                    Person.findById (request.params.id)
+                                                          .then(person => 
+                                                                        {
+                                                                          if (person)
+                                                                          {
+                                                                            response.json (person)
+                                                                          } else 
+                                                                          {
+                                                                            response.status(404).end()
+                                                                          }
+                                                                        }
+                                                               )
+                                                          .catch(error => next(error))
                                                   }
         )
 
