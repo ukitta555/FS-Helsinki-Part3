@@ -5,10 +5,9 @@ const cors = require ('cors')
 const app = express() 
 const Person = require('./models/person')
 
-
-app.use(cors())
-app.use (express.json())
 app.use(express.static('build'))
+app.use (express.json())
+app.use(cors())
 
 morgan.token ('bodyOutput', (request, result) =>
                                                 {
@@ -21,29 +20,6 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 
 
 
-
-let persons = [
-  { 
-    name: "Arto Hellas", 
-    phone: "040-123456",
-    id: 1
-  },
-  { 
-    name: "Ada Lovelace", 
-    phone: "39-44-5323523",
-    id: 2
-  },
-  { 
-    name: "Dan Abramov", 
-    phone: "12-43-234345",
-    id: 3
-  },
-  { 
-    name: "Mary Poppendieck", 
-    phone: "39-23-6423122",
-    id: 4
-  }
-]
 
 app.get ('/', (request, response) =>
                                     {
@@ -83,11 +59,15 @@ app.get ('/api/persons/:id', (request, response) =>
         )
 
 app.delete('/api/persons/:id', (request, response) =>
-                                            {
-                                              const id = Number (request.params.id)
-                                              persons = persons.filter (person => person.id !== id)
-                                              response.status(204).end()
-                                            }
+                                                      {
+                                                        Person.findByIdAndDelete(request.params.id)
+                                                              .then(result =>
+                                                                            {
+                                                                              response.status(204).end()
+                                                                            } 
+                                                                   )
+                                                              .catch(error => console.log('error occured while deleting', error.message))
+                                                      }
           )
 
 
