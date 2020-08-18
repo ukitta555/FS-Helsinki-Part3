@@ -4,6 +4,7 @@ const morgan = require('morgan')
 const cors = require ('cors')
 const app = express() 
 const Person = require('./models/person')
+const e = require('express')
 
 app.use(express.static('build'))
 app.use (express.json())
@@ -106,17 +107,7 @@ app.post ('/api/persons', (request, response, next) =>
                                                 }
                                                 Person.find({})
                                                       .then(people => 
-                                                                      {
-                                                                        console.log(people)
-                                                                        if (people.map(person => person.name.toLocaleLowerCase())
-                                                                                   .findIndex(personName => {return body.name.toLocaleLowerCase() === personName})
-                                                                                   !== -1
-                                                                           )
-                                                                        {
-                                                                          response.status(400)
-                                                                                  .json ({error: "name must be unique"})
-                                                                          throw new Error ("name has to be unique!")
-                                                                        }
+                                                                      { 
                                                                         const person = new Person (
                                                                                                     {
                                                                                                       name: body.name,
@@ -148,6 +139,9 @@ const errorHandler = (error, request, response, next) =>
                                                           if (error.name === 'CastError')
                                                           {
                                                             return response.status(400).send({error: 'malformatted id'})
+                                                          } else if (error.name === 'ValidationError')
+                                                          {
+                                                            return response.status(400).send({error: 'name has to be unique! (inside validator!)'})
                                                           }
                                                           next(error)
                                                         }
