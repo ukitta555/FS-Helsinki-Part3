@@ -4,7 +4,6 @@ const morgan = require('morgan')
 const cors = require ('cors')
 const app = express() 
 const Person = require('./models/person')
-const e = require('express')
 
 app.use(express.static('build'))
 app.use (express.json())
@@ -12,7 +11,7 @@ app.use(cors())
 
 morgan.token ('bodyOutput', (request, result) =>
                                                 {
-                                                  if (request.method === "POST") return JSON.stringify(request.body)
+                                                  if (request.method === "POST" || request.method === "PUT") return JSON.stringify(request.body)
                                                   else return ''
                                                 }
              )
@@ -89,10 +88,11 @@ app.put ('/api/persons/:id', (request, response, next) =>
                                                           const body = request.body
 
                                                           const person = {
+                                                                            name: body.name,
                                                                             phone: body.phone
                                                                          }
-                                                          Person.findByIdAndUpdate(request.params.id, person, {new: true})
-                                                                .then (updatedEntry => response.json(updatedEntry))
+                                                          Person.findByIdAndUpdate(request.params.id, person, {new: true, runValidators: true, context: 'query'})
+                                                                .then (updatedEntry => response.json(updatedEntry.toJSON()))
                                                                 .catch (error => next(error))
                                                         }
         )
@@ -133,15 +133,17 @@ const unknownEndpoint = (request, response) =>
 
 app.use(unknownEndpoint)
 
+
+//TODO: Add update validation!
 const errorHandler = (error, request, response, next) => 
                                                         {
-                                                          console.log (error.message,'handler')
+                                                          console.log (error.message)
                                                           if (error.name === 'CastError')
                                                           {
                                                             return response.status(400).send({error: 'malformatted id'})
                                                           } else if (error.name === 'ValidationError')
                                                           {
-                                                            return response.status(400).send({error: 'name has to be unique! (inside validator!)'})
+                                                            return response.status(400).json({error: error.message})
                                                           }
                                                           next(error)
                                                         }

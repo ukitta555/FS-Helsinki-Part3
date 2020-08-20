@@ -1,6 +1,7 @@
-PUT http://localhost:3001/api/persons/xd
+PUT http://localhost:3001/api/persons/5f3ac3ba05bd381140dcee03
 Content-Type: application/json
 
 {
-  "phone":"987654"
+  "name": "Vlad",
+  "phone":"91231232132"
 }
